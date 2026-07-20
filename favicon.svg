@@ -1,0 +1,11 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer decorative hex rings -->
+  <polygon points="32,2 58,17 58,47 32,62 6,47 6,17" fill="none" stroke="#6b7280" stroke-width="0.8" opacity="0.2"/>
+  <polygon points="32,7 54,20 54,44 32,57 10,44 10,20" fill="none" stroke="#6b7280" stroke-width="0.8" opacity="0.2"/>
+  <!-- Indigo ring -->
+  <polygon points="32,11 52,22 52,42 32,53 12,42 12,22" fill="none" stroke="#3b4bff" stroke-width="1" opacity="0.35"/>
+  <!-- Filled center hex -->
+  <polygon points="32,15 50,25 50,39 32,49 14,39 14,25" fill="#3b4bff"/>
+  <!-- n3os on one line -->
+  <text x="32" y="36" text-anchor="middle" font-family="'DM Mono', monospace, monospace" font-size="11" font-weight="700" fill="#ffffff">n3os</text>
+</svg>

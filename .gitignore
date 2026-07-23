@@ -1,2 +1,18 @@
 node_modules/
 .next/
+
+# Server logs / debug artifacts — never track these
+error_log
+*.log
+npm-debug.log*
+
+# WordPress / legacy backend — this site is a static export, no PHP backend
+wp-config.php
+wp-content/
+wp-admin/
+wp-includes/
+*.php
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db

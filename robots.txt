@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Disallow: /_next/
+Disallow: /*.txt$
+
+Sitemap: https://n3os.com/sitemap.xml

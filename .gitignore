@@ -1,5 +1,13 @@
+# Dependencies / build tooling (not used in this static export, kept as guardrails)
 node_modules/
 .next/
+dist/
+build/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
 
 # Server logs / debug artifacts — never track these
 error_log
@@ -16,3 +24,4 @@ wp-includes/
 # OS / editor cruft
 .DS_Store
 Thumbs.db
+*.swp

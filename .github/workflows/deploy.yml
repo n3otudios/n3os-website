@@ -31,6 +31,9 @@ jobs:
 
       - name: Build static site
         run: npm run build
+        env:
+          VITE_NOTIFY_ENDPOINT: ${{ secrets.VITE_NOTIFY_ENDPOINT }}
+          VITE_CONTACT_ENDPOINT: ${{ secrets.VITE_CONTACT_ENDPOINT }}
 
       # `npm run build` exits non-zero if prerendering fails, but a page can
       # still come out structurally wrong. This asserts the two things that

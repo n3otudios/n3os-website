@@ -1,0 +1,30 @@
+{
+  "name": "n3os-site",
+  "version": "2.2.0",
+  "private": true,
+  "description": "n3os.com — marketing site for N3O Studios' AI tool directory. React + Vite, prerendered to static assets.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node scripts/prerender.mjs",
+    "build:client-only": "vite build",
+    "preview": "vite preview",
+    "shells": "node scripts/build-html-shells.mjs"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "^0.165.0",
+    "@react-three/fiber": "^8.17.10",
+    "@react-three/drei": "^9.114.3",
+    "framer-motion": "^11.11.17",
+    "lucide-react": "^0.453.0"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0",
+    "@vitejs/plugin-react": "^4.3.3"
+  },
+  "engines": {
+    "node": ">=20.19"
+  }
+}

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    (function () {
+      var el = document.documentElement;
+      el.classList.add("js");
+      try {
+        var stored = localStorage.getItem("n3os-theme");
+        var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (stored === "dark" || (stored !== "light" && prefersDark)) {
+          el.setAttribute("data-theme", "dark");
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- Browser chrome follows the active theme instead of always being brand blue. -->
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#2563eb" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19" />
+
+  <title>About — n3os</title>
+  <meta name="description" content="n3os is built by N3O Studios: a small team building a curated platform for discovering, using, and creating AI and productivity tools." />
+  <meta name="keywords" content="AI tool hub, free AI tools, AI tool directory, N3O Studios, AI tools 2026" />
+  <meta name="author" content="N3O Studios" />
+  <link rel="canonical" href="https://n3os.com/about.html" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="n3os" />
+  <meta property="og:locale" content="en_GB" />
+  <meta property="og:title" content="About — n3os" />
+  <meta property="og:description" content="n3os is built by N3O Studios: a small team building a curated platform for discovering, using, and creating AI and productivity tools." />
+  <meta property="og:url" content="https://n3os.com/about.html" />
+  <meta property="og:image" content="https://n3os.com/og-image.png" />
+  <meta property="og:image:alt" content="n3os — the platform for tools that actually work." />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="About — n3os" />
+  <meta name="twitter:description" content="n3os is built by N3O Studios: a small team building a curated platform for discovering, using, and creating AI and productivity tools." />
+  <meta name="twitter:image" content="https://n3os.com/og-image.png" />
+
+  <!-- Both faces are used above the fold (body copy and the wordmark), so
+       discovering them via the stylesheet costs a round trip of invisible text. -->
+  <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin />
+
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <link rel="stylesheet" href="/src/styles/main.css" />
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/entries/about.jsx"></script>
+</body>
+</html>

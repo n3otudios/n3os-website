@@ -1,0 +1,1030 @@
+/* =========================================================================
+   n3os — main stylesheet
+   Structure: fonts -> tokens (light/dark) -> reset -> layout -> typography
+   -> components -> page-specific -> utilities -> motion -> print
+   ========================================================================= */
+
+/* ---------- Fonts (self-hosted, latin + latin-ext subsets) ----------
+   Each face now carries an explicit unicode-range. Without one on the latin
+   face, it claimed *every* codepoint, so the latin-ext file was never
+   requested and accented characters silently fell back to a system font. */
+@font-face {
+  font-family: "Inter Variable";
+  src: url("/fonts/inter-latin.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Inter Variable";
+  src: url("/fonts/inter-latin-ext.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "JetBrains Mono Variable";
+  src: url("/fonts/jetbrains-mono-latin.woff2") format("woff2");
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "JetBrains Mono Variable";
+  src: url("/fonts/jetbrains-mono-latin-ext.woff2") format("woff2");
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ---------- Design tokens ---------- */
+:root {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "JetBrains Mono Variable", ui-monospace, "SF Mono", monospace;
+
+  /* Light theme (default) */
+  --color-ink: #0b0f19;
+  --color-paper: #ffffff;
+  --color-surface: #f8fafc;
+  --color-muted: #64748b;
+  --color-muted-2: #94a3b8;
+  --color-line: #e2e8f0;
+  --color-line-strong: #cbd5e1;
+  --color-brand: #2563eb;
+  /* Brand blue is only AA-legible as *text* on light backgrounds. On dark
+     surfaces this switches to the lighter tint, so small brand-coloured text
+     (eyebrows, inline links) stays readable instead of dropping to ~4.2:1. */
+  --color-brand-text: #2563eb;
+  --color-brand-tint: #eff6ff;
+  --color-brand-light: #60a5fa;
+  --color-fixed-dark: #0b0f19; /* intentionally-dark UI (notify card) — never flips in dark mode */
+  --color-amber-100: #fef3c6;
+  --color-amber-500: #f99c00;
+  --color-amber-700: #b75000;
+  --color-danger: #dc2626;
+
+  --color-live-bg: #dcfce7;
+  --color-live-text: #15803d;
+  --color-planned-bg: #e2e8f0;
+  --color-planned-text: #475569; /* was --color-muted on --color-line: 3.9:1, below AA */
+
+  --shadow-card: 0 1px 2px rgba(11, 15, 25, 0.04), 0 1px 1px rgba(11, 15, 25, 0.03);
+  --shadow-card-hover: 0 20px 45px -20px rgba(11, 15, 25, 0.25);
+  --shadow-header: 0 24px 70px -24px rgba(11, 15, 25, 0.35);
+
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --container-width: 1180px;
+  --header-height: 4.75rem;
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --color-ink: #f1f5f9;
+  --color-paper: #0b0f19;
+  --color-surface: #131826;
+  --color-muted: #94a3b8;
+  --color-muted-2: #94a3b8; /* the darker slate failed AA on near-black; collapse the two */
+  --color-line: #1e293b;
+  --color-line-strong: #334155;
+  --color-brand: #3572e0; /* slightly darker than a naive blue-500 so white button text clears 4.5:1 */
+  --color-brand-text: #93c5fd;
+  --color-brand-tint: rgba(37, 99, 235, 0.14);
+  --color-brand-light: #93c5fd;
+  --color-amber-100: rgba(249, 156, 0, 0.16);
+  --color-amber-500: #f99c00;
+  --color-amber-700: #ffb648;
+
+  --color-live-bg: rgba(34, 197, 94, 0.16);
+  --color-live-text: #4ade80;
+  --color-planned-bg: #1e293b;
+  --color-planned-text: #cbd5e1;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 1px rgba(0, 0, 0, 0.2);
+  --shadow-card-hover: 0 24px 55px -20px rgba(0, 0, 0, 0.55);
+  --shadow-header: 0 24px 70px -24px rgba(0, 0, 0, 0.6);
+
+  color-scheme: dark;
+}
+
+/* ---------- Permanently-dark sections (independent of the light/dark toggle) ----------
+   Re-declares the dark-theme token values locally so every component inside
+   (cards, text, borders, buttons) renders as if in dark mode, without needing
+   [data-theme="dark"] on <html>. Used for the "No paywalls" -> footer stretch
+   of the page, which stays dark in both themes. */
+.perma-dark {
+  --color-ink: #f1f5f9;
+  --color-paper: #0b0f19;
+  --color-surface: #131826;
+  --color-muted: #94a3b8;
+  --color-muted-2: #94a3b8;
+  --color-line: #1e293b;
+  --color-line-strong: #334155;
+  --color-brand: #3572e0;
+  --color-brand-text: #93c5fd;
+  --color-brand-tint: rgba(37, 99, 235, 0.14);
+  --color-brand-light: #93c5fd;
+  --color-amber-100: rgba(249, 156, 0, 0.16);
+  --color-amber-500: #f99c00;
+  --color-amber-700: #ffb648;
+  --color-live-bg: rgba(34, 197, 94, 0.16);
+  --color-live-text: #4ade80;
+  --color-planned-bg: #1e293b;
+  --color-planned-text: #cbd5e1;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  color-scheme: dark;
+}
+
+/* ---------- Reset ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  /* Without this, every in-page anchor (#roadmap, #notify) lands underneath
+     the sticky header and the target heading is hidden behind it. */
+  scroll-padding-top: calc(var(--header-height) + 1rem);
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s var(--ease-out), color 0.25s var(--ease-out);
+  /* `clip` contains the off-canvas 3D accents without turning <body> into a
+     scroll container, which is what `hidden` does. `hidden` stays first as
+     the fallback for older engines. */
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+img, svg { display: block; max-width: 100%; }
+img { height: auto; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+input, textarea, select { font: inherit; color: inherit; }
+ul, ol { list-style: none; padding: 0; }
+
+/* visible keyboard focus everywhere */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+/* <main> is focused programmatically by the skip link; it shouldn't draw a
+   focus ring around the entire page when that happens. */
+main:focus { outline: none; }
+
+/* ---------- Skip link ---------- */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100%;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-brand);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card-hover);
+  transition: top 0.2s var(--ease-out);
+}
+.skip-link:focus-visible { top: 1rem; }
+
+/* ---------- Layout ---------- */
+.container-page {
+  max-width: var(--container-width);
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+@media (min-width: 768px) {
+  .container-page { padding-inline: 2rem; }
+}
+
+.section { padding-block: 5rem; }
+.section--tight { padding-block: 3.5rem; }
+.border-t { border-top: 1px solid var(--color-line); }
+.border-b { border-bottom: 1px solid var(--color-line); }
+.bg-surface { background: var(--color-surface); }
+
+@media (min-width: 768px) {
+  .section { padding-block: 8rem; }
+  .section--tight { padding-block: 5rem; }
+}
+
+/* Sections that host an absolutely-positioned 3D accent. */
+.has-scene { position: relative; }
+.has-scene--clip { overflow: hidden; }
+.section-body { position: relative; z-index: 1; }
+
+/* ---------- Typography ---------- */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+p { text-wrap: pretty; }
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--color-brand-text);
+  text-shadow: 0 0 14px color-mix(in srgb, currentColor 45%, transparent);
+}
+.eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px color-mix(in srgb, currentColor 65%, transparent);
+}
+.eyebrow--center { justify-content: center; }
+
+.text-muted { color: var(--color-muted); }
+.text-brand { color: var(--color-brand-text); text-shadow: 0 0 14px color-mix(in srgb, currentColor 40%, transparent); }
+.font-mono { font-family: var(--font-display); }
+
+/* Fluid rather than stepped: the old two-breakpoint scale jumped from 36px
+   straight to 48px at exactly 768px, so tablet widths were noticeably
+   under-set. clamp() covers every width in between. */
+.h1 { font-size: clamp(2.25rem, 1.6rem + 2.6vw, 3rem); }
+.h2 { font-size: clamp(1.875rem, 1.5rem + 1.5vw, 2.25rem); }
+.h3 { font-size: 1.25rem; }
+
+.lede {
+  color: var(--color-muted);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+}
+
+/* Shared section opener: eyebrow / heading / lede. */
+.section-head { max-width: 32rem; }
+.section-head--center { text-align: center; margin-inline: auto; }
+.section-head--narrow { max-width: 32rem; }
+.section-head--wide { max-width: 42rem; }
+.section-head .h2 { margin-top: 1rem; }
+.section-head .lede { margin-top: 0.75rem; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-xl);
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out),
+    background-color 0.2s var(--ease-out), border-color 0.2s var(--ease-out), color 0.2s var(--ease-out);
+  white-space: nowrap;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn[disabled] { opacity: 0.6; cursor: not-allowed; transform: none; }
+.btn--primary {
+  background: var(--color-brand);
+  color: #fff;
+  box-shadow: 0 12px 30px -12px rgba(37, 99, 235, 0.55);
+}
+.btn--primary:hover { box-shadow: 0 16px 36px -12px rgba(37, 99, 235, 0.65); }
+.btn--ghost {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  border: 1px solid var(--color-line);
+}
+.btn--ghost:hover { border-color: var(--color-line-strong); background: var(--color-surface); }
+.btn--sm { padding: 0.5rem 1rem; font-size: 0.8125rem; }
+.btn--block { width: 100%; }
+
+/* ---------- Site header / nav ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: color-mix(in srgb, var(--color-paper) 82%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--color-line);
+}
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 1rem;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.0625rem;
+  color: var(--color-ink);
+}
+.logo__mark {
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+}
+.logo__mark--footer {
+  width: 24px;
+  height: 28px;
+  object-fit: contain;
+}
+.logo__sub {
+  display: block;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 0.6875rem;
+  color: var(--color-muted);
+  letter-spacing: 0.01em;
+}
+.nav__links {
+  display: none;
+  align-items: center;
+  gap: 2rem;
+}
+@media (min-width: 768px) {
+  .nav__links { display: flex; }
+}
+.nav__link {
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  transition: color 0.2s var(--ease-out);
+  position: relative;
+}
+.nav__link:hover, .nav__link[aria-current="page"] { color: var(--color-ink); }
+.nav__link[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -1.15rem;
+  height: 2px;
+  background: var(--color-brand);
+}
+.nav__actions { display: flex; align-items: center; gap: 0.5rem; }
+
+/* theme toggle — both icons live in the DOM and CSS picks one, so the correct
+   icon paints immediately from the pre-paint theme attribute rather than
+   flipping after hydration. */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-line);
+  color: var(--color-muted);
+  transition: border-color 0.2s var(--ease-out), color 0.2s var(--ease-out), background-color 0.2s var(--ease-out);
+}
+.theme-toggle:hover { color: var(--color-ink); border-color: var(--color-line-strong); background: var(--color-surface); }
+.theme-toggle svg { width: 18px; height: 18px; }
+.theme-toggle .icon-sun { display: none; }
+[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
+/* mobile nav */
+.nav__burger {
+  display: inline-flex;
+  width: 38px; height: 38px;
+  align-items: center; justify-content: center;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-line);
+  color: var(--color-ink);
+}
+@media (min-width: 768px) { .nav__burger { display: none; } }
+
+.mobile-menu__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  background: rgba(11, 15, 25, 0.45);
+  backdrop-filter: blur(2px);
+}
+.mobile-menu {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 50;
+  background: var(--color-paper);
+  border-bottom: 1px solid var(--color-line);
+  box-shadow: var(--shadow-header);
+  padding: 1.25rem 1.5rem 1.75rem;
+}
+.mobile-menu__top { display: flex; justify-content: flex-end; }
+.mobile-menu__close {
+  width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-md); color: var(--color-muted);
+}
+.mobile-menu__close:hover { color: var(--color-ink); }
+.mobile-menu__links { display: flex; flex-direction: column; gap: 0.25rem; margin-top: 0.5rem; }
+.mobile-menu__links a {
+  padding: 0.85rem 0.25rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  border-bottom: 1px solid var(--color-line);
+}
+.mobile-menu__cta { margin-top: 1.25rem; }
+
+/* ---------- Footer ---------- */
+.site-footer {
+  border-top: 1px solid var(--color-line);
+  padding-block: 3.5rem 2.5rem;
+  background: var(--color-paper);
+}
+.footer-grid {
+  display: grid;
+  gap: 2.5rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .footer-grid { grid-template-columns: 1.4fr 0.8fr 0.8fr; gap: 2rem; }
+}
+.footer-brand p { margin-top: 0.85rem; max-width: 30rem; color: var(--color-muted); font-size: 0.9rem; line-height: 1.6; }
+.footer-brand .directory-note { margin-top: 0.85rem; font-family: var(--font-display); font-size: 0.8rem; color: var(--color-muted); }
+.footer-col h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-muted); font-weight: 600; }
+.footer-col ul { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.65rem; }
+.footer-col a { color: var(--color-muted); font-size: 0.9rem; transition: color 0.2s; }
+.footer-col a:hover { color: var(--color-brand-text); }
+.footer-bottom {
+  margin-top: 3rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--color-line);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+@media (min-width: 768px) {
+  .footer-bottom { flex-direction: row; justify-content: space-between; }
+}
+
+/* ---------- Marquee (brand statement strip) ---------- */
+.marquee {
+  overflow: hidden;
+  border-top: 1px solid var(--color-line);
+  border-bottom: 1px solid var(--color-line);
+  background: var(--color-surface);
+  padding-block: 0.9rem;
+}
+.marquee__track {
+  display: flex;
+  gap: 3rem;
+  width: max-content;
+  animation: marquee 32s linear infinite;
+}
+.marquee__item {
+  display: flex; align-items: center; gap: 0.6rem;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+.marquee__item::before { content: "◆"; color: var(--color-brand-light); font-size: 0.6rem; }
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-33.333%); }
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  position: relative;
+  padding-block: 5rem 4rem;
+  text-align: center;
+  overflow: hidden;
+}
+@media (min-width: 768px) { .hero { padding-block: 7rem 5rem; } }
+.hero__scene { position: absolute; inset: 0; z-index: 0; }
+.hero__content { position: relative; z-index: 1; }
+.hero__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-line);
+  background: var(--color-paper);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+.hero__badge .dot { width: 6px; height: 6px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 0 3px rgba(22,163,74,0.18); }
+.hero h1 {
+  margin-top: 1.25rem;
+  font-size: clamp(2.5rem, 1.5rem + 4vw, 3.75rem);
+  max-width: 42rem;
+  margin-inline: auto;
+}
+.hero p.lede { max-width: 34rem; margin: 1.25rem auto 0; }
+.hero__actions {
+  margin-top: 2.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+}
+@media (min-width: 480px) { .hero__actions { flex-direction: row; justify-content: center; } }
+
+/* ---------- Tool directory demo ---------- */
+.demo {
+  margin-top: 3.5rem;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--color-line);
+  background: color-mix(in srgb, var(--color-paper) 96%, transparent);
+  box-shadow: var(--shadow-header);
+  overflow: hidden;
+  text-align: left;
+  position: relative;
+  z-index: 1;
+}
+.demo__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-line);
+  background: var(--color-surface);
+}
+.demo__dot { width: 10px; height: 10px; border-radius: 50%; }
+.demo__dot--r { background: #ff5f57; }
+.demo__dot--y { background: #febc2e; }
+.demo__dot--g { background: #28c840; }
+.demo__url {
+  margin-left: 0.5rem;
+  flex: 1;
+  background: var(--color-paper);
+  border-radius: var(--radius-md);
+  padding: 0.3rem 0.75rem;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  color: var(--color-muted); /* was --color-muted-2: 2.6:1 on white */
+}
+.demo__screenshot {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.demo__note { margin-top: 1.5rem; text-align: center; font-size: 0.75rem; color: var(--color-muted); }
+
+/* ---------- Feature strip under the hero ---------- */
+.feature-strip {
+  margin-top: 3rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.75rem;
+  font-size: 0.82rem;
+  color: var(--color-muted);
+  position: relative; z-index: 1;
+}
+.feature-strip li { display: inline-flex; align-items: center; gap: 0.4rem; }
+.feature-strip li::before { content: "✓"; color: var(--color-brand-text); font-weight: 700; }
+
+/* ---------- Vision section ---------- */
+/* Permanently black background (not the usual --color-fixed-dark #0b0f19)
+   per brief — the orb and its glow are designed to sit on true black. */
+.vision { text-align: center; background: #000; }
+.vision__stage {
+  position: relative;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.vision__scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+.vision__copy { position: relative; z-index: 1; max-width: 34rem; margin-inline: auto; }
+.vision__copy h2 { margin-top: 1rem; }
+.vision__copy p.lede { margin-top: 1rem; }
+@media (min-width: 900px) {
+  .vision__stage { min-height: 520px; }
+}
+
+/* ---------- Roadmap ---------- */
+/* This rule did not exist. The component referenced `.roadmap-scene`, so the
+   canvas had no dimensions, collapsed to zero height, and the three phase
+   cubes never rendered anywhere on the page. */
+.roadmap-scene {
+  display: none;
+  position: absolute;
+  top: 3rem;
+  right: 3%;
+  width: 180px;
+  height: 240px;
+  z-index: 0;
+}
+@media (min-width: 1240px) {
+  .roadmap-scene { display: block; }
+}
+
+.roadmap-grid {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+}
+@media (min-width: 900px) { .roadmap-grid { grid-template-columns: repeat(3, 1fr); } }
+.roadmap-card {
+  position: relative;
+  padding: 1.5rem;
+  border: 1px solid var(--color-line);
+  background: var(--color-paper);
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+  transition: border-color 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+}
+.roadmap-card:hover { border-color: var(--color-line-strong); box-shadow: var(--shadow-card-hover); }
+.roadmap-card__num {
+  position: absolute;
+  top: -0.5rem; right: -0.25rem;
+  font-family: var(--font-display);
+  font-size: 6rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  opacity: 0.05;
+  line-height: 1;
+}
+.roadmap-card__icon {
+  width: 56px; height: 56px;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-muted);
+}
+.roadmap-card__icon svg { width: 22px; height: 22px; }
+.roadmap-card__head { display: flex; align-items: center; gap: 0.6rem; margin-top: 1.1rem; flex-wrap: wrap; }
+.roadmap-card h3 { font-size: 1.05rem; }
+.status-pill {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+}
+.status-pill--live { background: var(--color-live-bg); color: var(--color-live-text); }
+.status-pill--progress { background: var(--color-amber-100); color: var(--color-amber-700); }
+.status-pill--planned { background: var(--color-planned-bg); color: var(--color-planned-text); }
+.roadmap-card p { margin-top: 0.6rem; color: var(--color-muted); font-size: 0.9rem; line-height: 1.55; max-width: 20rem; }
+.roadmap-card__bar { margin-top: 1.2rem; height: 4px; border-radius: 999px; background: var(--color-line); position: relative; }
+.roadmap-card__bar span { display: block; height: 100%; border-radius: 999px; }
+.roadmap-card--live .roadmap-card__bar span { width: 100%; background: #22c55e; }
+.roadmap-card--progress .roadmap-card__bar span {
+  width: 55%;
+  background: var(--color-amber-500);
+  transform-origin: left center;
+  animation: meter-bounce 1.3s ease-in-out infinite;
+}
+.roadmap-card--planned .roadmap-card__bar span { width: 8%; background: var(--color-line-strong); }
+@keyframes meter-bounce {
+  0%, 100% { transform: translateY(0) scaleX(1); }
+  50% { transform: translateY(-3px) scaleX(1.04); }
+}
+
+/* ---------- Detail card (Every tool, fully indexed) ---------- */
+.detail-scenes-row {
+  display: none;
+  justify-content: space-between;
+  max-width: 30rem;
+  margin: 1.5rem auto 0;
+}
+.detail-scene { width: 140px; height: 140px; }
+@media (min-width: 700px) {
+  .detail-scenes-row { display: flex; }
+}
+.detail-card {
+  max-width: 30rem;
+  margin: 2.75rem auto 0;
+  padding: 1.75rem;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--color-line);
+  background: var(--color-paper);
+  box-shadow: var(--shadow-card-hover);
+}
+.detail-card__url { font-family: var(--font-display); font-size: 0.75rem; color: var(--color-muted); }
+.detail-card__screenshot {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 0.9rem;
+  border-radius: var(--radius-lg);
+}
+
+/* ---------- FAQ ---------- */
+.faq-grid {
+  display: grid;
+  gap: 3rem;
+  margin-top: 2rem;
+}
+@media (min-width: 768px) { .faq-grid { grid-template-columns: 280px 1fr; gap: 4rem; } }
+.faq-intro .h2 { margin-top: 1rem; }
+.faq-intro .lede { margin-top: 0.75rem; max-width: 16rem; }
+.faq-bulb-stage {
+  margin-top: 1.5rem;
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 1;
+}
+.faq-item { border-bottom: 1px solid var(--color-line); }
+/* The trigger is wrapped in a heading for document structure; that heading
+   must not introduce its own type styling. */
+.faq-item__heading { margin: 0; font: inherit; letter-spacing: normal; }
+.faq-item__trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 1.15rem;
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+.faq-item__trigger:hover { color: var(--color-brand-text); }
+.faq-item__trigger svg { width: 16px; height: 16px; color: var(--color-muted); flex-shrink: 0; transition: transform 0.25s var(--ease-out); }
+.faq-item.is-open .faq-item__trigger svg { transform: rotate(180deg); }
+.faq-item__panel p { padding-bottom: 1.15rem; padding-right: 2rem; font-size: 0.9rem; line-height: 1.65; color: var(--color-muted); }
+
+/* ---------- Free CTA band ---------- */
+.free-band { position: relative; overflow: hidden; text-align: center; padding-block: 5rem; }
+.free-band h2 { margin-top: 1.1rem; }
+.free-band p.lede { margin: 1rem auto 0; max-width: 26rem; }
+.free-band .btn { margin-top: 1.75rem; }
+.free-band .eyebrow { color: var(--color-brand-light); }
+
+.scene-corner {
+  display: none;
+  position: absolute;
+  top: 50%;
+  width: 140px;
+  height: 140px;
+  transform: translateY(-50%);
+}
+.scene-corner--left { left: 4%; }
+.scene-corner--right { right: 4%; }
+@media (min-width: 900px) {
+  .scene-corner { display: block; }
+}
+
+/* ---------- Notify form ---------- */
+.notify-section { position: relative; padding-inline: 1.5rem; }
+.notify-band {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 3rem 1.5rem;
+  border-radius: var(--radius-2xl);
+  background: var(--color-fixed-dark);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+  max-width: 42rem;
+  margin-inline: auto;
+}
+.notify-band h2 { color: #fff; font-size: 1.35rem; }
+.notify-form {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 26rem;
+  margin-inline: auto;
+}
+@media (min-width: 480px) { .notify-form { flex-direction: row; flex-wrap: wrap; } }
+.notify-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+/* 0.45 alpha landed at ~4.4:1 against the field; 0.55 clears AA. */
+.notify-form input::placeholder { color: rgba(255,255,255,0.55); }
+.notify-form .btn--primary { flex-shrink: 0; }
+.notify-form .form-status { flex-basis: 100%; }
+.form-status { margin-top: 0.85rem; font-size: 0.82rem; color: var(--color-muted); min-height: 1.2em; }
+.notify-band .form-status { color: rgba(255,255,255,0.72); }
+.notify-band .form-status a { color: var(--color-brand-light); text-decoration: underline; }
+
+.notify-scene {
+  display: none;
+  position: absolute;
+  top: 50%;
+  width: 220px;
+  height: 220px;
+  transform: translateY(-50%);
+}
+.notify-scene--left { left: 4%; }
+.notify-scene--right { right: 4%; }
+@media (min-width: 1100px) {
+  .notify-scene { display: block; }
+}
+
+/* ---------- Generic page hero (about/contact/pricing) ---------- */
+.page-hero { text-align: center; padding-block: 4rem 3rem; }
+@media (min-width: 768px) { .page-hero { padding-block: 5.5rem 3.5rem; } }
+.page-hero h1 { margin-top: 1rem; max-width: 34rem; margin-inline: auto; }
+.page-hero p.lede { max-width: 26rem; margin: 1rem auto 0; }
+.page-hero--free h1 { color: var(--color-brand); }
+
+/* ---------- About page ---------- */
+.about-story { max-width: 42rem; margin-inline: auto; }
+.about-story p { margin-top: 1.1rem; color: var(--color-muted); font-size: 1rem; line-height: 1.75; }
+.about-story strong { color: var(--color-ink); font-weight: 600; }
+.about-cta { margin-top: 2.5rem; display: flex; gap: 0.85rem; flex-wrap: wrap; justify-content: center; }
+
+/* ---------- Contact page ---------- */
+.contact-grid {
+  display: grid;
+  gap: 2.5rem;
+  margin-top: 2.5rem;
+}
+@media (min-width: 900px) { .contact-grid { grid-template-columns: 1fr 1.3fr; gap: 3rem; } }
+.contact-info-card {
+  padding: 1.5rem;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+  height: fit-content;
+}
+.contact-info-row { display: flex; gap: 0.85rem; padding-block: 0.9rem; border-bottom: 1px solid var(--color-line); }
+.contact-info-row:last-child { border-bottom: none; }
+.contact-info-row svg { width: 18px; height: 18px; color: var(--color-brand-text); flex-shrink: 0; margin-top: 0.15rem; }
+.contact-info-row h2 { font-size: 0.85rem; }
+.contact-info-row p { margin-top: 0.15rem; font-size: 0.85rem; color: var(--color-muted); }
+.contact-form { display: flex; flex-direction: column; gap: 1.1rem; }
+.form-row { display: flex; flex-direction: column; gap: 0.4rem; }
+.form-row label { font-size: 0.82rem; font-weight: 500; }
+.form-row input, .form-row textarea {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-line);
+  background: var(--color-paper);
+}
+.form-row input:focus, .form-row textarea:focus { border-color: var(--color-brand); }
+.form-row textarea { resize: vertical; min-height: 120px; }
+.contact-direct { margin-top: 1rem; font-size: 0.85rem; color: var(--color-muted); text-align: center; }
+.contact-direct a { color: var(--color-brand-text); font-weight: 500; }
+
+/* ---------- Pricing page ---------- */
+.pricing-scene {
+  display: none;
+  position: absolute;
+  top: -2rem;
+  right: 8%;
+  width: 160px;
+  height: 160px;
+}
+@media (min-width: 700px) {
+  .pricing-scene { display: block; }
+}
+.pricing-grid {
+  display: grid;
+  gap: 1.75rem;
+  margin-top: 2.5rem;
+}
+@media (min-width: 800px) { .pricing-grid { grid-template-columns: 1fr 1fr; } }
+.price-card {
+  padding: 2rem;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--color-line);
+  background: var(--color-paper);
+  display: flex;
+  flex-direction: column;
+}
+.price-card--primary { border-color: var(--color-brand); box-shadow: var(--shadow-card-hover); position: relative; }
+.price-card__badge {
+  align-self: flex-start;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-live-text);
+  background: var(--color-live-bg);
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+}
+.price-card__badge--muted { color: var(--color-muted); background: var(--color-surface); }
+.price-card h2 { margin-top: 1rem; font-size: 1.1rem; }
+.price-card__amount { margin-top: 0.75rem; display: flex; align-items: baseline; gap: 0.4rem; }
+.price-card__amount strong { font-family: var(--font-display); font-size: 2.5rem; }
+.price-card__amount span { color: var(--color-muted); font-size: 0.9rem; }
+.price-card ul { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; flex: 1; }
+.price-card li { display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.9rem; color: var(--color-muted); }
+.price-card li svg { width: 15px; height: 15px; margin-top: 0.2rem; flex-shrink: 0; color: var(--color-brand-text); }
+.price-card li.is-locked svg { color: var(--color-muted); }
+.price-card .btn { margin-top: 1.75rem; }
+.pricing-note {
+  max-width: 34rem;
+  margin: 3rem auto 0;
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+/* ---------- 404 ---------- */
+.error-page { text-align: center; padding-block: 7rem; }
+.error-page .code {
+  font-family: var(--font-display);
+  font-size: 5rem;
+  font-weight: 700;
+  /* --color-line-strong put this at 1.5:1 on white. It's aria-hidden and so
+     decorative, but "decorative" shouldn't mean "illegible". */
+  color: var(--color-muted);
+}
+.error-page h1 { margin-top: 0.5rem; }
+.error-page p.lede { max-width: 28rem; margin: 1rem auto 0; }
+.error-page__links {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.25rem;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--color-brand-text);
+}
+.error-page__links a:hover { text-decoration: underline; }
+.error-page .btn { margin-top: 2rem; }
+
+/* ---------- 3D scene containers ---------- */
+/* Every scene wrapper is decorative and must never swallow a click. */
+.scene { pointer-events: none; }
+
+/* ---------- Misc utilities ---------- */
+.center { text-align: center; }
+.mx-auto { margin-inline: auto; }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+/* ---------- Reduced motion ----------
+   Framer Motion already respects this for the reveals; these rules cover the
+   CSS-driven motion (marquee, meter bounce, hover lifts, smooth scrolling)
+   that Framer never sees. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .marquee__track { animation: none; }
+  .roadmap-card--progress .roadmap-card__bar span { animation: none; }
+  .btn:hover { transform: none; }
+}
+
+/* ---------- Print ---------- */
+@media print {
+  .site-header, .mobile-menu, .mobile-menu__backdrop, .marquee, .scene, .skip-link { display: none !important; }
+  body { background: #fff; color: #000; }
+  .perma-dark, .vision, .notify-band { background: #fff !important; color: #000 !important; }
+  .perma-dark *, .notify-band * { color: #000 !important; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.8em; }
+  .section, .section--tight { padding-block: 1.5rem; }
+}

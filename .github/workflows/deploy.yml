@@ -1,0 +1,100 @@
+name: Build & Deploy n3os.com
+
+on:
+  push:
+    branches: [main]
+  # Build (but don't deploy) on PRs, so a broken build is caught before merge
+  # rather than at deploy time.
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-n3os
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build static site
+        run: npm run build
+
+      # `npm run build` exits non-zero if prerendering fails, but a page can
+      # still come out structurally wrong. This asserts the two things that
+      # have actually broken before: empty roots, and unreplaced placeholders.
+      - name: Verify prerendered output
+        run: |
+          set -e
+          for file in dist/index.html dist/about.html dist/contact.html dist/subscriptions.html dist/404.html; do
+            if grep -q '<div id="root"></div>' "$file"; then
+              echo "::error::$file was not prerendered (root div is still empty)"
+              exit 1
+            fi
+          done
+          if grep -rq '<!--faq-jsonld-->' dist/; then
+            echo "::error::FAQ structured-data placeholder was not replaced"
+            exit 1
+          fi
+          echo "All pages prerendered."
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 5
+
+  deploy-ftp:
+    name: Deploy to BigRock (FTP)
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      # The workflow previously read secrets.FTP_HOST while the README told you
+      # to set FTP_SERVER, so a correctly-configured repo would still deploy to
+      # an empty host. Fail with a readable message instead.
+      - name: Check FTP secrets are set
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          missing=""
+          [ -z "$FTP_SERVER" ] && missing="$missing FTP_SERVER"
+          [ -z "$FTP_USERNAME" ] && missing="$missing FTP_USERNAME"
+          [ -z "$FTP_PASSWORD" ] && missing="$missing FTP_PASSWORD"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secrets:$missing"
+            exit 1
+          fi
+
+      - name: Deploy over FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./dist/
+          # Defaults to the account root; set FTP_SERVER_DIR to e.g. /public_html/
+          # if your document root sits elsewhere.
+          server-dir: ${{ secrets.FTP_SERVER_DIR || './' }}
+          dangerous-clean-slate: false

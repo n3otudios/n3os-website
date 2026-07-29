@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    (function () {
+      var el = document.documentElement;
+      el.classList.add("js");
+      try {
+        var stored = localStorage.getItem("n3os-theme");
+        var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (stored === "dark" || (stored !== "light" && prefersDark)) {
+          el.setAttribute("data-theme", "dark");
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- Browser chrome follows the active theme instead of always being brand blue. -->
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#2563eb" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19" />
+
+  <title>Page not found — n3os</title>
+  <meta name="description" content="This page could not be found." />
+  <meta name="author" content="N3O Studios" />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="canonical" href="https://n3os.com/404.html" />
+
+  <!-- Both faces are used above the fold (body copy and the wordmark), so
+       discovering them via the stylesheet costs a round trip of invisible text. -->
+  <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin />
+
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <link rel="stylesheet" href="/src/styles/main.css" />
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/entries/notfound.jsx"></script>
+</body>
+</html>

@@ -77,12 +77,12 @@ jobs:
       # an empty host. Fail with a readable message instead.
       - name: Check FTP secrets are set
         env:
-          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_HOST: ${{ secrets.FTP_HOST }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
           missing=""
-          [ -z "$FTP_SERVER" ] && missing="$missing FTP_SERVER"
+          [ -z "$FTP_HOST" ] && missing="$missing FTP_HOST"
           [ -z "$FTP_USERNAME" ] && missing="$missing FTP_USERNAME"
           [ -z "$FTP_PASSWORD" ] && missing="$missing FTP_PASSWORD"
           if [ -n "$missing" ]; then
